@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
-    userId : {
+    orderId : {
         type : String,
         required : true,
-        unique : true
+        unique : true,
     },
     email : {
         type : String,
@@ -26,6 +26,10 @@ const orderSchema = new mongoose.Schema({
         type : String,
         required : true,
         default : "pending"
+    },
+    labelledTotal : {
+        type : Number,
+        required : true,
     },
     total : {
         type : Number,
