@@ -5,9 +5,11 @@ import productRouter from "./routes/productRouter.js";
 import userRouter from "./routes/userRouter.js";
 import orderRouter from "./routes/orderRouter.js";
 import jwt from "jsonwebtoken";
+import cors from "cors";
 
 const app = express();  
 
+app.use(cors());
 app.use(bodyParser.json()); 
 
 app.use((req, res, next) => {
@@ -36,9 +38,9 @@ mongoose.connect("mongodb+srv://admin:123@cluster0.fkisd.mongodb.net/?retryWrite
   console.log("Error connecting to MongoDB");
 });
 
-app.use("/products", productRouter);
-app.use("/users", userRouter);
-app.use("/orders", orderRouter);
+app.use("/api/products", productRouter);
+app.use("/api/users", userRouter);
+app.use("/api/orders", orderRouter);
 
 app.listen(3000, () => {
   console.log("Server is running on port http://localhost:3000");  
