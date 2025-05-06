@@ -18,7 +18,7 @@ app.use((req, res, next) => {
   const tokenString = req.header("Authorization");
   if (tokenString != null) {
     const token = tokenString.replace("Bearer ", "");
-    jwt.verify(token, "Rasil-kvns-nsbm-12314-28371", (err, decoded) => {
+    jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
       if(decoded != null) {
         req.user = decoded;
         next();
