@@ -66,7 +66,7 @@ export async function createOrder(req, res) {
             address : orderInfo.address,
             total : 0,
             phone : orderInfo.phone,
-            products : [],
+            products : [],   //i change this products : [],
             labelledTotal : labelledTotal,
             total : total
         });
@@ -75,5 +75,23 @@ export async function createOrder(req, res) {
         res.json({ message: "Order created successfully", order: createdOrder });
     } catch(err) {
         res.status(500).json({ message: "Failed to create order", error: err.message });
+    }
+}
+
+export async function getOrders(req, res) {
+    if(req.user == null) {
+        return res.status(403).json({ message: "Please login first and try again" });
+    }
+
+    try {
+        if(req.user.role !== "admin") {
+            const orders = await Order.find();
+            return res.json(orders);
+        }else {
+            const orders = await Order.find({ email: req.user.email });
+            return res.json(orders);
+        }
+    } catch(err) {
+        res.status(500).json({ message: "Failed to fetch orders", error: err.message });
     }
 }

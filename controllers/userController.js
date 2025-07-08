@@ -62,7 +62,11 @@ export function loginuser(req, res) {
                 );
 
                 console.log("User logged in");
-                res.json({ message: "User logged in", token: token });
+                res.json({ message: "User logged in", 
+                          token: token,
+                          role: user.role,});
+
+
             } else {
                 console.log("Invalid password");
                 res.json({ message: "Invalid password" });
