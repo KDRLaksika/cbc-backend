@@ -3,6 +3,8 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import axios from "axios";
+import nodemailer from "nodemailer";
+import OTP from "../models/otp.js";
 dotenv.config();
 
 export function createUser(req, res) {
@@ -145,6 +147,92 @@ export async function loginWithGoogle(req, res) {
             });
         }
         
+}
+
+const transport = nodemailer.createTransport({
+    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: {
+      user: 'rasillaksika24@gmail.com',
+      pass: process.env.APP_PASSWORD,
+    },
+    tls: {
+      rejectUnauthorized: false
+    }
+  });
+
+export async function sendOTP(req, res) {
+
+    const randomOTP = Math.floor(100000 + Math.random() * 900000);
+    const email = req.body.email;
+    if(email == null) {
+        res.status(400).json({ message: "Email is required" });
+        return;
+    }
+
+    const user = await User.findOne({ email: email });
+    if(user == null) {
+        res.status(404).json({ message: "User not found" });
+        return;
+    }
+
+    //Delete any existing OTP for this email
+
+    await OTP.deleteMany({ email: email });
+
+    const message = {
+        from: 'rasillaksika24@gmail.com',
+        to: email,
+        subject: 'Resetting password for crystal beauty clear.',
+        text: 'This is your password reset OTP: ' + randomOTP,
+    };
+
+    const otp = new OTP({
+        email: email,
+        otp: randomOTP,
+    });
+
+    await otp.save();
+
+    transport.sendMail(message, (error,infor)=> {
+        if(error) {
+            console.log("Error sending email: ", error);
+            res.status(500).json({ message: "Error sending email", error: error.toString() });
+        } else {
+            console.log("Email sent successfully");
+            res.json({ message: "Email sent successfully", otp: randomOTP });
+        }
+    });
+
+}
+
+export async function resetPassword(req, res) {
+    const email = req.body.email;
+    const otp = req.body.otp;
+    const newPassword = req.body.newPassword;
+
+    const response = await OTP.findOne({ email: email, otp: otp });
+    if(response == null) {
+        res.status(500).json({ message: "No otp requests found please try again" });
+        return;
+    }
+
+    if(otp == response.otp){
+        await OTP.deleteMany({ email: email, otp: otp });
+        const hashedPassword = bcrypt.hashSync(newPassword, 10);
+        const response2 = await User.updateOne(
+            { email: email },
+            { password: hashedPassword }
+        )
+        res.json({ message: "Password reset successfully" });
+        return;
+    }else {
+        res.status(403).json({ message: "OTP does not match" });
+        return;
+    }
+
 }
 
 export function isAdmin(req, res) {
