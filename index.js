@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import productRouter from "./routes/productRouter.js";
 import userRouter from "./routes/userRouter.js";
 import orderRouter from "./routes/orderRouter.js";
+import reviewRouter from "./routes/reviewRouter.js";
 import jwt from "jsonwebtoken";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -43,6 +44,7 @@ mongoose.connect(process.env.MONGODB_URL).then(() => {
 app.use("/api/products", productRouter);
 app.use("/api/users", userRouter);
 app.use("/api/orders", orderRouter);
+app.use("/api/reviews", reviewRouter);
 
 app.listen(3000, () => {
   console.log("Server is running on port http://localhost:3000");  
