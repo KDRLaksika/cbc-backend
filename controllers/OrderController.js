@@ -16,7 +16,7 @@ export async function createOrder(req, res) {
 		orderInfo.name = req.user.firstName + " " + req.user.lastName;
 	}
 
-	//CBC00001
+	
 	let orderId = "CBC00001";
 
 	const lastOrder = await Order.find().sort({ date: -1 }).limit(1);
